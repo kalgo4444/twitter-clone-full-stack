@@ -8,6 +8,7 @@ export default async function AppLayout({
 	children: React.ReactNode
 }>) {
 	const session = await getServerSession(authOption)
+	console.log(session)
 
 	if (!session) {
 		return <Auth />

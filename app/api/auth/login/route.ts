@@ -1,6 +1,7 @@
 import User from '@/database/models/user.model'
 import { connectToDatabase } from '@/lib/mongoose'
 import { passValidate } from '@/lib/password'
+import { UserDto } from '@/utils/user.dto'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
@@ -36,11 +37,9 @@ export async function POST(req: Request) {
 		}
 
 		//user dto
+		const user = new UserDto(isExistingUser)
 
-		return NextResponse.json(
-			{ success: true, user: isExistingUser },
-			{ status: 200 }
-		)
+		return NextResponse.json({ success: true, user }, { status: 200 })
 	} catch (error) {
 		const result = error as Error
 		return NextResponse.json({ error: result.message }, { status: 400 })
