@@ -1,0 +1,59 @@
+import User from '@/database/models/user.model'
+import { AuthOptions } from 'next-auth'
+import { connectToDatabase } from './mongoose'
+
+import CredentialsProvider from 'next-auth/providers/credentials'
+import GitHubProvider from 'next-auth/providers/github'
+import GoogleProvider from 'next-auth/providers/google'
+
+export const authOption: AuthOptions = {
+	providers: [
+		CredentialsProvider({
+			name: 'Credentials',
+			credentials: {
+				email: { label: 'Email', type: 'text' },
+				password: { label: 'Password', type: 'password' }
+			},
+			async authorize(credentials) {
+				await connectToDatabase()
+
+				const isExistingUser = await User.findOne({
+					email: credentials?.email
+				})
+
+				return isExistingUser
+			}
+		}),
+		GitHubProvider({
+			clientId: process.env.GITHUB_CLIENT_ID!,
+			clientSecret: process.env.GITHUB_CLIENT_SECRET!
+		}),
+		GoogleProvider({
+			clientId: process.env.GOOGLE_CLIENT_ID!,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+		})
+	],
+	callbacks: {
+		async session({ session }: any) {
+			await connectToDatabase()
+
+			const isExistingUser = await User.findOne({ email: session.user?.email })
+			if (!isExistingUser) {
+				const newUser = await User.create({
+					email: session.user?.email,
+					name: session.user?.name,
+					profileImage: session.user?.image
+				})
+
+				session.currentUser = newUser
+			}
+
+			session.currentUser = isExistingUser
+			return session
+		}
+	},
+	debug: process.env.NODE_ENV === 'development',
+	session: { strategy: 'jwt' },
+	jwt: { secret: process.env.NEXTAUTH_JWT_SECRET! },
+	secret: process.env.NEXTAUTH_SECRET!
+}
