@@ -3,21 +3,18 @@
 import useLoginModal from '@/hooks/useLoginModal'
 import useRegisterModal from '@/hooks/useRegisterModal'
 import X from '@/public/images/x.svg'
-import { signIn, useSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 import Image from 'next/image'
 import { useCallback } from 'react'
 import { AiFillGithub } from 'react-icons/ai'
 import { FcGoogle } from 'react-icons/fc'
 import LoginModal from '../modals/LoginModal'
-import RegisterModal from '../modals/RegisterModal'
+import RegisterModal from '../modals/register-modal/RegisterModal'
 import { Button } from '../ui/button'
 
 export default function Auth() {
 	const registerModal = useRegisterModal()
 	const loginModal = useLoginModal()
-
-	const { data } = useSession()
-	console.log(data)
 
 	const onOpenRegisterModal = useCallback(() => {
 		registerModal.onOpen()
@@ -29,8 +26,8 @@ export default function Auth() {
 
 	return (
 		<>
-			<LoginModal />
-			<RegisterModal />
+			{loginModal.isOpen && <LoginModal />}
+			{registerModal.isOpen && <RegisterModal />}
 			<section className="container mx-auto">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center h-screen">
 					<Image

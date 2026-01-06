@@ -5,7 +5,7 @@ import useRegisterModal from '@/hooks/useRegisterModal'
 import { loginSchema } from '@/lib/validation'
 import { loginService } from '@/services/auth/auth.service'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AxiosError } from 'axios'
+import axios from 'axios'
 import { signIn } from 'next-auth/react'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
@@ -34,7 +34,6 @@ export default function LoginModal() {
 
 	async function onSubmit(values: z.infer<typeof loginSchema>) {
 		try {
-			console.log(values)
 			const res = await loginService(values)
 			if (res.success) {
 				await signIn('credentials', {
@@ -42,10 +41,9 @@ export default function LoginModal() {
 					password: values.password
 				})
 				loginModal.onClose()
-				form.reset()
 			}
 		} catch (err) {
-			if (err instanceof AxiosError) {
+			if (axios.isAxiosError(err)) {
 				const error = err.response?.data
 				if (error.type === 'email') {
 					form.setError('email', {
