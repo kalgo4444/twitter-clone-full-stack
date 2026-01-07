@@ -1,12 +1,10 @@
 import User from '@/database/models/user.model'
 import { connectToDatabase } from '@/lib/mongoose'
 import { hashPassword } from '@/lib/password'
-import { UserDto } from '@/utils/user.dto'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
 	try {
-		// connect to db
 		await connectToDatabase()
 
 		const { searchParams } = new URL(req.url)
@@ -47,8 +45,7 @@ export async function POST(req: Request) {
 				password: hashPass
 			})
 
-			//user dto
-			const user = new UserDto(newUser)
+			const user = newUser
 			return NextResponse.json({ success: true, user }, { status: 201 })
 		}
 		return NextResponse.json({ success: true }, { status: 200 })

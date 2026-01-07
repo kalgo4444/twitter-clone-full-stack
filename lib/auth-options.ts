@@ -2,7 +2,6 @@ import User from '@/database/models/user.model'
 import { AuthOptions } from 'next-auth'
 import { connectToDatabase } from './mongoose'
 
-import { UserDto } from '@/utils/user.dto'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GitHubProvider from 'next-auth/providers/github'
 import GoogleProvider from 'next-auth/providers/google'
@@ -22,7 +21,7 @@ export const authOption: AuthOptions = {
 					email: credentials?.email
 				})
 
-				const user = new UserDto(isExistingUser)
+				const user = isExistingUser
 
 				return user
 			}
@@ -50,8 +49,7 @@ export const authOption: AuthOptions = {
 
 				session.currentUser = newUser
 			}
-
-			session.currentUser = new UserDto(isExistingUser)
+			session.currentUser = isExistingUser
 			return session
 		}
 	},
